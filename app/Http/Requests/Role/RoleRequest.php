@@ -22,14 +22,15 @@ class RoleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string'
+            'name' => 'required|string|max:255'
         ];
     }
-    public function messages()
+    public function messages(): array
     {
         return [
             'name.required' => 'Nhâp tên vai trò',
-            'name.string' => 'Tên vai trò phải là chuỗi'
+            'name.string' => 'Tên vai trò phải là chuỗi',
+            'name.max' => 'Tên quyền tối đa được :max ký tự'
         ];
     }
 }

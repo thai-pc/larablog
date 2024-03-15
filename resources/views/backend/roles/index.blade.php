@@ -1,11 +1,9 @@
 @section('title', 'Danh sách vai trò')
 @extends('backend.layouts.master')
 @section('content')
-    @if(session('success'))
-        <div class="alert alert-success" role="alert">
-           {{session('success')}}
-        </div>
-    @endif
+
+    @include('backend.layouts.success')
+
     <div class="d-flex justify-content-between">
         <a href="{{route('backend.role.create')}}" class="btn btn-primary rounded">Thêm</a>
     </div>
@@ -17,7 +15,11 @@
         @forelse($roles as $role)
             <tr>
                 <td>{{ $role->name }}</td>
-                <td>
+                <td class="d-flex">
+                    <a href="{{route('backend.role.assign.permission', [$role->id])}}" class="btn btn-success btn-sm rounded">
+                        <i class="material-icons">connect_without_contact</i>
+                        Gán quyền
+                    </a>
                     <a href="{{route('backend.role.edit', [$role->id])}}" class="btn btn-warning btn-sm rounded">
                         <i class="material-icons">edit</i>
                         Cập nhật

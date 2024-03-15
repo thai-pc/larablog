@@ -34,10 +34,7 @@ class UserController extends Controller
         $user = User::create($request->all());
         $user->assignRole($request->role_id);
         $user->addMedia($request->avatar)->toMediaCollection('user_avatar');
-        return response()->json([
-            'success' => true,
-            'message' => 'Thêm người dùng ' . $user->name . ' thành công'
-        ], 201);
+        return redirect()->route('backend.users.index')->with('success', 'Thêm người dùng ' . $user->name . ' thành công');
     }
 
     public function edit(User $user)

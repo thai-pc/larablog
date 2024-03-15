@@ -11,28 +11,29 @@
         @csrf
         <div class="form-group">
             <label for="name">Tên</label>
-            <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" id="name" placeholder="Nhập tên người dùng">
+            <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" placeholder="Nhập tên người dùng">
             @error('name')
             <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
         <div class="form-group">
             <label for="email">Email</label>
-            <input type="text" class="form-control @error('email') is-invalid @enderror" name="email" id="email" placeholder="Nhập email người dùng">
+            <input type="text" class="form-control @error('email') is-invalid @enderror" name="email" placeholder="Nhập email người dùng">
             @error('email')
             <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
         <div class="form-group">
             <label for="password">Mật khẩu</label>
-            <input type="password" class="form-control @error('password') is-invalid @enderror" name="password" id="password" placeholder="Nhập mật khẩu người dùng">
+            <input type="password" class="form-control @error('password') is-invalid @enderror" name="password" placeholder="Nhập mật khẩu người dùng">
             @error('password')
             <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
         <div class="form-group">
             <label for="roles">Vai trò</label>
-            <select name="role_id" id="roles" class="form-control @error('role_id') is-invalid @enderror">
+            <select name="role_id" class="form-control @error('role_id') is-invalid @enderror">
+                <option value="0">Vui lòng chọn vai trò</option>
                 @foreach($roles as $role)
                     <option value="{{ $role->name }}">{{ strtoupper($role->name) }}</option>
                 @endforeach
