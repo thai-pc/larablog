@@ -34,7 +34,7 @@ class UserController extends Controller
         $user = User::create($request->all());
         $user->assignRole($request->role_id);
         $user->addMedia($request->avatar)->toMediaCollection('user_avatar');
-        return redirect()->route('backend.users.index')->with('success', 'Thêm người dùng ' . $user->name . ' thành công');
+        return $this->redirectUser('Thêm người dùng ' . $user->name . ' thành công');
     }
 
     public function edit(User $user)
@@ -52,6 +52,9 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         $user->delete();
+        if ($user->getMedia('avatar')->isNotEmpty()) {
+            $user->getMedia('avatar')[0]->delete();
+        }
         return $this->redirectUser('Xóa người dùng ' . $user->name . ' thành công');
     }
 

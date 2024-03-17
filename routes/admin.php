@@ -71,7 +71,8 @@ Route::resource('/admin/posts', PostController::class)->names([
     'update' => 'backend.posts.update',
     'destroy' => 'backend.posts.destroy'
 ]);
-
+Route::match(['get', 'post'], 'admin/posts/upload', [PostController::class, 'uploadPhoto'])
+    ->name('backend.posts.upload');
 Route::get('/admin/post/trashed', [PostController::class, 'trashedPost'])
     ->name('backend.posts.trash');
 Route::post('/admin/post/{post}/restore', [PostController::class, 'restorePost'])

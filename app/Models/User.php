@@ -15,6 +15,7 @@ class User extends Authenticatable implements HasMedia
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles, InteractsWithMedia;
 
+    const PATH = 'users';
     /**
      * The attributes that are mass assignable.
      *
@@ -59,6 +60,7 @@ class User extends Authenticatable implements HasMedia
     {
        return $this->getMedia('user_avatar')->first()->getUrl();
     }
+
     public function clearMediaCollection(string $collectionName = 'default'):HasMedia
     {
 

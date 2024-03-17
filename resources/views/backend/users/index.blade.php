@@ -38,7 +38,7 @@
             </tr>
         @empty
             <tr class="text-center">
-                <td colspan="4">Không tìm thấy người dùng nào</td>
+                <td colspan="5">Không tìm thấy người dùng nào</td>
             </tr>
         @endforelse
 

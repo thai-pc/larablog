@@ -1,4 +1,4 @@
-@section('title', 'Thùng rác thể loại')
+@section('title', 'Thùng rác bài viết')
 @extends('backend.layouts.master')
 @section('content')
 
@@ -6,27 +6,27 @@
 
     <div class="d-flex justify-content-between">
         <a href="{{route('backend.categories.index')}}"
-           class="btn btn-primary rounded">Danh sách thể loại</a>
+           class="btn btn-primary rounded">Danh sách bài viết</a>
     </div>
     <table class="table table-hover table-bordered table-dark">
         <tr>
-            <th>Tên</th>
+            <th>Tiêu đề</th>
             <th>Đường dẫn</th>
             <th>Hành động</th>
         </tr>
-        @forelse($categories as $categorie)
+        @forelse($posts as $post)
             <tr>
-                <td>{{ $categorie->name }}</td>
-                <td>{{ $categorie->slug }}</td>
+                <td>{{ $post->title}}</td>
+                <td>{{ $post->slug }}</td>
                 <td class="d-flex">
-                    <form action="{{route('backend.categories.restore', [$categorie->id])}}" method="post">
+                    <form action="{{route('backend.posts.restore', [$post->id])}}" method="post">
                         @csrf
                         <button class="btn btn-warning btn-sm rounded">
                             <i class="material-icons">restore</i>
                             Khôi phục
                         </button>
                     </form>
-                    <form action="{{route('backend.categories.force.delete', [$categorie->id])}}" method="post">
+                    <form action="{{route('backend.posts.force.delete', [$post->id])}}" method="post">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-danger btn-sm rounded">
@@ -38,7 +38,7 @@
             </tr>
         @empty
             <tr class="text-center">
-                <td colspan="4">Không tìm thấy thể loại nào trong thùng rác</td>
+                <td colspan="4">Không tìm thấy bài viết nào trong thùng rác</td>
             </tr>
         @endforelse
 

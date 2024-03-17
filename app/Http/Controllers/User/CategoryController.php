@@ -75,7 +75,7 @@ class CategoryController extends Controller
     public function trashedCategory()
     {
         return view('backend.categories.trash')
-            ->with('categories', Category::withTrashed()->get());
+            ->with('categories',  Category::onlyTrashed()->get());
     }
 
     public function restoreCategory($id)

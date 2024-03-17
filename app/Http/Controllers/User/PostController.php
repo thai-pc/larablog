@@ -33,13 +33,18 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $post = Post::create([
-            'title'         => $request->title,
-            'content'       => $request->post_content,
-            'status'        => $request->status,
-            'excerpt'       => $request->excerpt,
-            'user_id'       => 18,
-            'category_id'   => $request->category_id
+            'title' => $request->title,
+            'content' => $request->post_content,
+            'status' => $request->status,
+            'excerpt' => $request->excerpt,
+            'user_id' => 70,
+            'category_id' => $request->category_id
         ]);
+
+        if($request->hasFile('feature_image')){
+            $post->addMedia($request->feature_image)->toMediaCollection('feature_image');
+        }
+
         return redirect()->route('backend.posts.index')
             ->with('success', "Thêm bài viết thành công");
     }
@@ -57,7 +62,8 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        //
+        $categories = Category::all();
+        return view('backend.posts.edit', compact(['post', 'categories']));
     }
 
     /**
@@ -65,7 +71,23 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        //
+        $post->update([
+            'title'         => $request->input('title', $post->title),
+            'content'       => $request->input('post_content', $post->content),
+            'status'        => $request->input('status', $post->status),
+            'excerpt'       => $request->input('excerpt', $post->excerpt),
+            'user_id'       => 70,
+            'category_id'   => $request->input('category_id', $post->category_id)
+        ]);
+
+        if($request->hasFile('feature_image')){
+            $post->media()->delete();
+            $post->addMedia($request->feature_image)
+                ->toMediaCollection("feature_image");
+        }
+
+        return redirect()->route('backend.posts.index')
+            ->with('success', "Cập nhật bài viết thành công");
     }
 
     /**
@@ -73,12 +95,15 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        //
+        $post->delete();
+        return redirect()->route('backend.posts.index')
+            ->with('success', "Xóa bài viết thành công");
     }
+
     public function trashedPost()
     {
         return view('backend.posts.trash')
-            ->with('posts', Post::withTrashed()->get());
+            ->with('posts', Post::onlyTrashed()->get());
     }
 
     public function restorePost($id)
@@ -92,9 +117,76 @@ class PostController extends Controller
 
     public function forceDeletePost($id)
     {
-        Post::withTrashed()
-            ->where('id', $id)->forceDelete();
+        $post =  Post::withTrashed()->where('id', $id)->first();
+        preg_match_all('/<img[^>]+src="([^"]+)"[^>]*>/i', $post->content, $matches);
+
+        foreach ($matches[1] as $image) {
+            $absolutePath = public_path($image);
+            if (file_exists($absolutePath)) {
+                //Cấp 1
+                $directoryPath1 = dirname($absolutePath);
+                //Cấp 2
+                $directoryPath2 = dirname(dirname($absolutePath));
+                $filesInDirectory = scandir($directoryPath1);
+                // Loại bỏ "." và ".." khỏi danh sách file
+                $filesInDirectory = array_diff($filesInDirectory, ['.', '..']);
+                // Nếu thư mục chỉ chứa một file (file hiện tại), xóa thư mục cha
+                if (count($filesInDirectory) === 0) {
+                    rmdir($directoryPath2);
+                }else{
+                    unlink($absolutePath);
+                }
+            }
+        }
+        if ($post->getMedia('feature_image')->isNotEmpty()) {
+            $post->getMedia('feature_image')[0]->delete();
+        }
+        $post->forceDelete();
         return redirect()->route('backend.posts.index')
             ->with('success', 'Tiếp tục xóa bài viết thành công');
     }
+
+    public function uploadPhoto(Request $request)
+    {
+        $message = '';
+        $url = null;
+        $CKEditorFuncNum = $request->input('CKEditorFuncNum');
+
+        if ($request->hasFile('upload')) {
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+            $maxSize = 2 * 1024;
+
+            $uploadedFile = $request->file('upload');
+            $ext = $uploadedFile->getClientOriginalExtension();
+            $size = $uploadedFile->getSize() / 1000;
+
+            if (!in_array(strtolower($ext), $allowedExtensions) || $size > $maxSize) {
+                $message = 'Tập tin không hợp lệ. Vui lòng tải lên tệp JPG, JPEG, PNG hoặc GIF có kích thước không quá 2MB';
+            }
+
+            if (!$message) {
+                $currentDate = date('Y-m-d');
+                $storagePath = storage_path('app/public/posts/images/' . $currentDate);
+
+                if (!file_exists($storagePath)) {
+                    mkdir($storagePath, 0777, true);
+                }
+
+                $filename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME) . '_' . uniqid() . '.' . $ext;
+
+                $uploadedFile->move($storagePath, $filename);
+
+                $url = asset("storage/posts/images/$currentDate/$filename");
+                $message = "Ảnh của bạn đã được tải lên thành công";
+
+                return "<script>window.parent.CKEDITOR.tools.callFunction($CKEditorFuncNum, '$url', '$message')</script>";
+            }
+        } else {
+            $message = 'Không có tệp được chọn';
+        }
+
+        return "<script>window.parent.CKEDITOR.tools.callFunction($CKEditorFuncNum, null, '$message')</script>";
+    }
+
+
 }

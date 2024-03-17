@@ -20,9 +20,8 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <!-- CSS Files -->
     <link id="pagestyle" href="{{asset('back-assets/css/material-dashboard.min.css')}}" rel="stylesheet" />
-    <!-- Nepcha Analytics (nepcha.com) -->
-    <!-- Nepcha is a easy-to-use web analytics. No cookies and fully compliant with GDPR, CCPA and PECR. -->
-    <script defer data-site="YOUR_DOMAIN_HERE" src="https://api.nepcha.com/js/nepcha-analytics.js"></script>
+
+    @yield('styles');
 </head>
 
 <body class="g-sidenav-show  bg-gray-200">
@@ -43,6 +42,7 @@
 </main>
 
 <!--   Core JS Files   -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="{{asset('back-assets/js/popper.min.js')}}"></script>
 <script src="{{asset('back-assets/js/bootstrap.min.js')}}"></script>
 <script src="{{asset('back-assets/js/perfect-scrollbar.min.js')}}"></script>
@@ -56,6 +56,7 @@
         Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
     }
 </script>
+@yield('scripts')
 <script src="{{asset('back-assets/js/material-dashboard.min.js')}}"></script>
 </body>
 
