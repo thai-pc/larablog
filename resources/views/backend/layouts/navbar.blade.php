@@ -3,8 +3,8 @@
     <div class="container-fluid py-1 px-3">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
-                <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="javascript:;">Trang chủ</a></li>
-                <li class="breadcrumb-item text-sm text-dark active" aria-current="page">@yield('title')</li>
+                <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="{{route('backend.dashboard')}}">Trang chủ</a></li>
+                <li class="breadcrumb-item text-sm text-dark active" aria-current="page"><a href="{{request()->url()}}">@yield('title')</a></li>
             </ol>
             <h6 class="font-weight-bolder mb-0">@yield('title')</h6>
         </nav>
@@ -91,8 +91,9 @@
                 </li>
                 <li class="nav-item d-flex align-items-center">
                     <a href="javascript:void(0)" class="nav-link text-body font-weight-bold px-0">
-                        <i class="fa fa-user me-sm-1"></i>
-                        <span class="d-sm-inline d-none">Admin</span>
+                        <img src="{{auth()->user()->avatar}}" class="navbar-brand-img rounded-circle" width="40px" height="40px"
+                             alt="{{auth()->user()->name}}">
+                        <span class="d-sm-inline d-none">{{auth()->user()->name}}</span>
                     </a>
                 </li>
             </ul>

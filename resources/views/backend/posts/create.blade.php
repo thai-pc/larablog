@@ -43,8 +43,8 @@
         </div>
         <div class="form-group">
             <label for="category_id">Thể loại</label>
-            <select name="category_id" id="category_id" class="form-control">
-                <option value="0">Vui lòng chọn thể loại</option>
+            <select name="category_id" id="category_id" class="form-control @error('category_id') is-invalid @enderror">
+                <option value="">Vui lòng chọn thể loại</option>
                 @forelse($categories as $category)
                     <option value="{{$category->id}}">{{$category->name}}</option>
                 @empty
@@ -54,11 +54,22 @@
             <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
+        <div class="form-group">
+            <label for="tags">Từ khóa</label>
+            <select class="form-control mutiple-tag" name="tags[]" multiple="multiple">
+            </select>
+            @error('tags')
+            <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
         <label for="feature_image">Ảnh đại diện</label>
         <div class="form-file-group my-2">
             <input type="file" name="feature_image" id="file-upload" style="display: none">
             <p>Kéo thả hoặc click vào khu vục này để tải ảnh lên</p>
         </div>
+        @error('feature_image')
+        <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
         <div id="previewBox" class="my-2" style="display: none">
             <img src="" alt="" id="previewImg" width="300px" class="img-fluid rounded">
             <i class="material-icons">delete</i>
@@ -73,6 +84,7 @@
 
 @endsection
 @section('styles')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
         .form-file-group {
             width: 100%;
@@ -125,5 +137,14 @@
             $(".form-file-group").css('display', 'block');
         })
 
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(".mutiple-tag").select2({
+            tags: true,
+            tokenSeparators: [','],
+            placeholder: "Vui lòng nhập từ khóa bài viết",
+            allowClear: true
+        })
     </script>
 @endsection

@@ -25,6 +25,7 @@ class User extends Authenticatable implements HasMedia
         'name',
         'email',
         'password',
+        'slug'
     ];
 
     /**
@@ -48,6 +49,12 @@ class User extends Authenticatable implements HasMedia
     ];
     protected $appends = ['role_id', 'avatar'];
 
+    public function setNameAttribute($value)
+    {
+        $this->attributes['name'] = $value;
+        $this->attributes['slug'] = str_slug($value);
+    }
+
     public function getRoleIdAttribute()
     {
         if ($this->roles->isNotEmpty()) {
@@ -63,6 +70,17 @@ class User extends Authenticatable implements HasMedia
 
     public function clearMediaCollection(string $collectionName = 'default'):HasMedia
     {
+
+    }
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
+    public function isModerator(array $permissions = []):bool
+    {
+        return $this->hasAnyRole(['admin', 'editor']) &&
+            $this->hasAnyPermission($permissions);
 
     }
 }

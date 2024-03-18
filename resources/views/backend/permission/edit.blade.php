@@ -18,6 +18,6 @@
             <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
-        <button type="submit" class="btn btn-success btn-block rounded">Lưu</button>
+        <button type="submit" class="btn btn-success btn-block rounded mt-2">Lưu</button>
     </form>
 @endsection

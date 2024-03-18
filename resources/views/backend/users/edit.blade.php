@@ -18,6 +18,6 @@
                 @endforeach
             </select>
         </div>
-        <button type="submit" class="btn btn-success btn-block rounded">Lưu</button>
+        <button type="submit" class="btn btn-success btn-block rounded mt-2">Cập nhật</button>
     </form>
 @endsection

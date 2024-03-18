@@ -21,7 +21,24 @@ class Post extends Model implements hasMedia
         'user_id',
         'category_id'
     ];
-    protected $appends = ['url', 'feature_image'];
+    protected $appends = ['feature_image'];
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+    public function comments()
+    {
+        return $this->morphMany(Comment::class, 'commentable')
+            ->whereNull('parent_id');
+    }
+    public function tags()
+    {
+        return $this->morphToMany(Tag::class, 'taggable');
+    }
     public function setTitleAttribute($value)
     {
         $this->attributes['title']  = $value;
@@ -31,11 +48,10 @@ class Post extends Model implements hasMedia
     {
 
     }
-    public function getUrlAttribute()
+    public function getFeatureImageAttribute()
     {
         $hasMedia = $this->getMedia('feature_image')->first();
-        return  $hasMedia != null ?
-            $hasMedia->getUrl() : "";
+        return $hasMedia != null ? $hasMedia->getUrl() : "";
     }
 
 }

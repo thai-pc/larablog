@@ -46,7 +46,7 @@
         <div class="form-group">
             <label for="category_id">Thể loại</label>
             <select name="category_id" id="category_id" class="form-control">
-                <option value="0">Vui lòng chọn thể loại</option>
+                <option value="">Vui lòng chọn thể loại</option>
                 @forelse($categories as $category)
                     <option value="{{$category->id}}"
                     @if($post->category_id == $category->id) selected @endif>{{$category->name}}</option>
@@ -57,13 +57,28 @@
             <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
+        <div class="form-group">
+            <label for="tags">Từ khóa</label>
+            <select class="form-control mutiple-tag" name="tags[]" multiple="multiple">
+                @forelse($tags as $tag)
+                    <option selected value="{{$tag->name}}">{{$tag->name}}</option>
+                @empty
+                @endforelse
+            </select>
+            @error('tags')
+            <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
         <label for="feature_image">Ảnh đại diện</label>
         <div class="form-file-group my-2">
             <input type="file" name="feature_image" id="file-upload" style="display: none">
             <p>Kéo thả hoặc click vào khu vục này để tải ảnh lên</p>
         </div>
+        @error('feature_image')
+        <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
         <div id="previewBox" class="my-2" style="display: none">
-            <img src="{{$post->url}}" alt="" id="previewImg" width="300px" class="img-fluid rounded">
+            <img src="{{$post->feature_image}}" alt="" id="previewImg" width="300px" class="img-fluid rounded">
             <i class="material-icons">delete</i>
         </div>
         @if($post->status == 'draft')
@@ -84,6 +99,7 @@
 
 @endsection
 @section('styles')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
         .form-file-group {
             width: 100%;
@@ -119,7 +135,7 @@
             $('#file-upload').click();
         })
         $(document).ready(function (){
-            let url = "{{$post->url}}";
+            let url = "{{$post->feature_image}}";
             if(url !== ""){
                 $("#previewBox").css('display', 'block');
                 $(".form-file-group").css('display', 'none');
@@ -143,5 +159,14 @@
             $(".form-file-group").css('display', 'block');
         })
 
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(".mutiple-tag").select2({
+            tags: true,
+            tokenSeparators: [','],
+            placeholder: "Vui lòng nhập từ khóa bài viết",
+            allowClear: true
+        })
     </script>
 @endsection

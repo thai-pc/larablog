@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Post\PostRequest;
 use App\Models\Category;
 use App\Models\Post;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
@@ -30,18 +32,34 @@ class PostController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(PostRequest $request)
     {
         $post = Post::create([
             'title' => $request->title,
             'content' => $request->post_content,
             'status' => $request->status,
             'excerpt' => $request->excerpt,
-            'user_id' => 70,
+            'user_id' => auth()->id(),
             'category_id' => $request->category_id
         ]);
 
-        if($request->hasFile('feature_image')){
+        if ($request->has('tags')) {
+            $tags = $request->tags;
+            $tags_id = [];
+
+            foreach ($tags as $tag) {
+                $tag_model = Tag::where('name', $tag)->first();
+                if ($tag_model) {
+                    array_push($tags_id, $tag_model->id);
+                } else {
+                    array_push($tags_id, (Tag::create(['name' => $tag]))->id);
+                }
+            }
+
+            $post->tags()->sync($tags_id);
+        }
+
+        if ($request->hasFile('feature_image')) {
             $post->addMedia($request->feature_image)->toMediaCollection('feature_image');
         }
 
@@ -62,25 +80,46 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
+        $this->authorize('update', $post);
         $categories = Category::all();
-        return view('backend.posts.edit', compact(['post', 'categories']));
+        $tags = $post->tags()->latest()->get();
+        return view('backend.posts.edit', compact(['post', 'categories', 'tags']));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Post $post)
+    public function update(PostRequest $request, Post $post)
     {
+        $this->authorize('update', $post);
         $post->update([
-            'title'         => $request->input('title', $post->title),
-            'content'       => $request->input('post_content', $post->content),
-            'status'        => $request->input('status', $post->status),
-            'excerpt'       => $request->input('excerpt', $post->excerpt),
-            'user_id'       => 70,
-            'category_id'   => $request->input('category_id', $post->category_id)
+            'title' => $request->input('title', $post->title),
+            'content' => $request->input('post_content', $post->content),
+            'status' => $request->input('status', $post->status),
+            'excerpt' => $request->input('excerpt', $post->excerpt),
+            'user_id' => auth()->id(),
+            'category_id' => $request->input('category_id', $post->category_id)
         ]);
 
-        if($request->hasFile('feature_image')){
+        // Cập nhật tags
+        if ($request->has('tags')) {
+            $tags = $request->tags;
+            $tags_id = [];
+            foreach ($tags as $tag) {
+                $tag_model = Tag::where('name', $tag)->first();
+                if ($tag_model) {
+                    array_push($tags_id, $tag_model->id);
+                } else {
+                    array_push($tags_id, (Tag::create(['name' => $tag]))->id);
+                }
+            }
+
+            $post->tags()->sync($tags_id);
+        } else {
+            $post->tags()->detach();
+        }
+
+        if ($request->hasFile('feature_image')) {
             $post->media()->delete();
             $post->addMedia($request->feature_image)
                 ->toMediaCollection("feature_image");
@@ -95,6 +134,7 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
+        $this->authorize('delete', $post);
         $post->delete();
         return redirect()->route('backend.posts.index')
             ->with('success', "Xóa bài viết thành công");
@@ -117,27 +157,17 @@ class PostController extends Controller
 
     public function forceDeletePost($id)
     {
-        $post =  Post::withTrashed()->where('id', $id)->first();
+        $post = Post::withTrashed()->where('id', $id)->first();
+        $this->authorize('delete', $post);
         preg_match_all('/<img[^>]+src="([^"]+)"[^>]*>/i', $post->content, $matches);
 
         foreach ($matches[1] as $image) {
             $absolutePath = public_path($image);
             if (file_exists($absolutePath)) {
-                //Cấp 1
-                $directoryPath1 = dirname($absolutePath);
-                //Cấp 2
-                $directoryPath2 = dirname(dirname($absolutePath));
-                $filesInDirectory = scandir($directoryPath1);
-                // Loại bỏ "." và ".." khỏi danh sách file
-                $filesInDirectory = array_diff($filesInDirectory, ['.', '..']);
-                // Nếu thư mục chỉ chứa một file (file hiện tại), xóa thư mục cha
-                if (count($filesInDirectory) === 0) {
-                    rmdir($directoryPath2);
-                }else{
-                    unlink($absolutePath);
-                }
+                unlink($absolutePath);
             }
         }
+
         if ($post->getMedia('feature_image')->isNotEmpty()) {
             $post->getMedia('feature_image')[0]->delete();
         }
