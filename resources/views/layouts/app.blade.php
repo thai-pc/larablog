@@ -84,11 +84,19 @@
 
             <div class="topbar-right-items pull-right">
                 <ul class="toplist toppadding">
-                    <li class="lineright">
+                    <li class="lineright dropdown">
                         @if(auth()->guest())
                             <a href="/login">Login</a>
                         @else
-                            <a href="/backpanel">{{auth()->user()->name}}</a>
+                            <a href="javasript:void()" class="dropdown-toggle" id="userDropdown" data-toggle="dropdown">
+                                {{ auth()->user()->name }}
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                    @csrf
+                                </form>
+                                <li><a onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Đăng xuất</a></li>
+                            </ul>
                         @endif
                     </li>
                     @if(!empty($site_fb_link))

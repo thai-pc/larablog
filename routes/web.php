@@ -3,6 +3,7 @@
 use App\Http\Controllers\Blog\FrontController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\HomeController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,10 +18,10 @@ use Illuminate\Support\Facades\Route;
 */
 //Auth Routes
 Auth::routes(['register' => false]);
+
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 require_once ('admin.php');
-
 
 Route::get('/', [FrontController::class, 'allPost']);
 Route::get('/{post:slug}', [FrontController::class, 'singlePost'])
